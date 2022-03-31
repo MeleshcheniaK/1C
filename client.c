@@ -14,10 +14,12 @@ struct sockaddr_in sockaddr;
 volatile sig_atomic_t socket_fd = -1;
 volatile sig_atomic_t must_exit = 0;
 
+/// Обработка сигналов остановки
 void HandleSigstop(int signum) {
   must_exit = 1;
 }
 
+/// Установка маски сигналов
 void SetSignalHandler() {
   struct sigaction action_stop;
   memset(&action_stop, 0, sizeof(action_stop));
@@ -27,6 +29,7 @@ void SetSignalHandler() {
   sigaction(SIGTERM, &action_stop, NULL);
 }
 
+/// Выделение сокета для клиента
 void SetSocket() {
   socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -36,12 +39,14 @@ void SetSocket() {
   }
 }
 
+/// Установка адреса для клиента
 void SetAddress(char* port_num, char* addrnum) {
   sockaddr.sin_family = AF_INET;
   sockaddr.sin_port = htons(atoi(port_num));
   sockaddr.sin_addr.s_addr = inet_addr(addrnum);
 }
 
+/// Активация клиента, ожидание сообщений и их последующая отправка
 void ClientFunc() {
   char str[STR_SIZE];
   int connect_ret = connect(socket_fd, (struct sockaddr*) &sockaddr, sizeof(sockaddr));
